@@ -85,10 +85,10 @@ export const EMAIL = "admin@hotsearchviet.online";
 export const FACEBOOK_APP_ID = "174600884477732";
 
 export function getHotSearchUrl(id) {
-	return `${myDomainName}/hotsearch/` + id;
+	return `/hotsearch/` + id;
 }
 export function getHotSearchDateUrl(date) {
-	return `${myDomainName}/daily-hotsearch/` + getdatesql(date);
+	return `/daily-hotsearch/` + getdatesql(date);
 }
 
 export function formatDate(date) {
