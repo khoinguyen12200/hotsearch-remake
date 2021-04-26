@@ -1,65 +1,97 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import styles from "../styles/Home.module.css";
+import React from "react";
+import { getdatesql, addSubtractDate } from "../components/Const";
+import { HotSearchGroup } from "../components/Hotsearch";
+import ThemeContext, { themes } from "../components/ThemeContext";
+import Selector from "../components/Selector";
 
-export default function Home() {
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+export async function getServerSideProps() {
+	const res = await fetch(
+		`http://localhost:3000/api/hotsearch/group/${getdatesql(new Date())}`
+	);
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+	const { data } = await res.json();
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+	return { props: { defaultData: data } };
+}
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+export default function Home({ defaultData }) {
+	const [data, setData] = React.useState([
+		{ date: new Date(), list: defaultData },
+	]);
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
+	const [loading, setLoading] = React.useState(false);
 
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
+	async function handleSeeMore() {
+		setLoading(true);
+		const lastDate = addSubtractDate(new Date(), -data.length);
+		const result = await fetch(
+			`http://localhost:3000/api/hotsearch/group/${getdatesql(lastDate)}`
+		);
+		const resultJson = await result.json();
 
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
+		const group = { date: lastDate, list: resultJson.data };
+		const newArr = data.concat(group);
+		setData(newArr);
+		setLoading(false);
+	}
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
+	return (
+		<div className={styles.container}>
+			<div className="main-content">
+				<div className="select-space">
+					<ThemeSelector />
+				</div>
+				<h1 className="title">
+					<img
+						className="vietnamflag"
+						src="/icons/vietnam-flag.png"
+					/>
+					Hot Search Việt Nam
+				</h1>
+
+				<div className="list-hot-search">
+					{data.map((group) => (
+						<HotSearchGroup
+							key={group.date}
+							date={group.date}
+							list={group.list}
+						/>
+					))}
+				</div>
+				<div className="button-space">
+					<button
+						disabled={loading}
+						onClick={handleSeeMore}
+						className="see-more"
+					>
+						Xem thêm
+					</button>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+function ThemeSelector() {
+	const { theme, setTheme } = React.useContext(ThemeContext);
+	if (typeof document !== "undefined") {
+		return (
+			<Selector
+				onChange={(value) => {
+					setTheme(value);
+				}}
+				activeTextColor="#fff"
+				textColor="#aaa"
+				backColor="#fc8600"
+				defaultValue={theme}
+				options={[
+					{ title: "Light", value: themes.light },
+					{ title: "Dark", value: themes.dark },
+				]}
+			/>
+		);
+	} else {
+		return null;
+	}
 }
