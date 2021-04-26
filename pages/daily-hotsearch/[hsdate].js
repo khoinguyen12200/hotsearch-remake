@@ -1,6 +1,6 @@
 import React from "react";
 import { useRouter } from "next/router";
-import { HotSearchGroup } from "../../components/HotSearch";
+import { HotSearchGroup } from "../../components/Hotsearch";
 import {
 	formatDate,
 	getVariableFromSearch,
