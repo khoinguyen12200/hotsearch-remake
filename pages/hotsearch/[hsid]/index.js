@@ -5,7 +5,7 @@ import {
 	getIdFromSearch,
 	getHotSearchUrl,
 	getHotSearchDateUrl,
-	getdatesql,
+	serverName,
 } from "../../../components/Const";
 import { ImFire, ImNewspaper } from "react-icons/im";
 import { AiOutlineFundView } from "react-icons/ai";
@@ -16,12 +16,18 @@ import { MdDateRange } from "react-icons/md";
 import Head from "next/head";
 
 export async function getServerSideProps(context) {
-	const res = await fetch(
-		`http://localhost:3000/api/hotsearch/${context.params.hsid}`
-	);
-
-	const { data } = await res.json();
-	return { props: { hotSearch: data } };
+	try{
+		const res = await fetch(
+			`${serverName}/api/hotsearch/${context.params.hsid}`
+		);
+	
+		const { data } = await res.json();
+		return { props: { hotSearch: data } };
+	}catch(e){
+		console.log(e)
+	}
+	return {props:{}}
+	
 }
 
 export default class HotSearchItem extends Component {
@@ -30,7 +36,7 @@ export default class HotSearchItem extends Component {
 	}
 
 	render() {
-		const { hotSearch } = this.props;
+		const hotSearch = this.props.hotSearch || null;
 		const link = hotSearch != null ? getHotSearchUrl(hotSearch.id) : "";
 		const groupLink =
 			hotSearch != null ? getHotSearchDateUrl(hotSearch.date) : "";

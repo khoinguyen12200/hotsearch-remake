@@ -1,24 +1,29 @@
-import styles from "../styles/Home.module.css";
 import React from "react";
-import { getdatesql, addSubtractDate } from "../components/Const";
+import { getdatesql, addSubtractDate,serverName } from "../components/Const";
 import { HotSearchGroup } from "../components/Hotsearch";
 import ThemeContext, { themes } from "../components/ThemeContext";
 import Selector from "../components/Selector";
 
 export async function getServerSideProps() {
-	const res = await fetch(
-		`http://localhost:3000/api/hotsearch/group/${getdatesql(new Date())}`
-	);
-
-	const { data } = await res.json();
-
-	return { props: { defaultData: data } };
+	try{
+		const res = await fetch(
+			`${serverName}/api/hotsearch/group/${getdatesql(new Date())}`
+		);
+	
+		const { data } = await res.json();
+	
+		return { props: { defaultData: data } };
+	}catch(e){
+		console.log(e)
+		return {props:{}}
+	}
+	
 }
 
-export default function Home({ defaultData }) {
-	const [data, setData] = React.useState([
+export default function Home({ defaultData = null }) {
+	const [data, setData] = React.useState(defaultData ? [
 		{ date: new Date(), list: defaultData },
-	]);
+	] : []);
 
 	const [loading, setLoading] = React.useState(false);
 
@@ -26,7 +31,7 @@ export default function Home({ defaultData }) {
 		setLoading(true);
 		const lastDate = addSubtractDate(new Date(), -data.length);
 		const result = await fetch(
-			`http://localhost:3000/api/hotsearch/group/${getdatesql(lastDate)}`
+			`${serverName}/api/hotsearch/group/${getdatesql(lastDate)}`
 		);
 		const resultJson = await result.json();
 
@@ -37,7 +42,7 @@ export default function Home({ defaultData }) {
 	}
 
 	return (
-		<div className={styles.container}>
+		<div>
 			<div className="main-content">
 				<div className="select-space">
 					<ThemeSelector />

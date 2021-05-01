@@ -1,14 +1,14 @@
 var mysql = require("mysql");
 
 // var pool = mysql.createPool({
-// 	connectionLimit: 50,
+// 	connectionLimit: 10,
 // 	host: "localhost",
 // 	user: "root",
 // 	password: "",
 // 	database: "hsdb",
 // });
 var pool = mysql.createPool({
-	connectionLimit: 50,
+	connectionLimit: 10,
 	host: "localhost",
 	user: "kbpqveyq_khoi",
 	password: "kbpqveyq_khoi2000",

@@ -6,27 +6,34 @@ import {
 	getVariableFromSearch,
 	getHotSearchDateUrl,
 	addSubtractDate,
-	getdatesql,
+	serverName,
 } from "../../components/Const";
 import { BiLeftArrow, BiRightArrow } from "react-icons/bi";
 
 export async function getServerSideProps(context) {
-	const res = await fetch(
-		`http://localhost:3000/api/hotsearch/group/${context.params.hsdate}`
-	);
-
-	const { data } = await res.json();
-	return { props: { date: context.params.hsdate, data } };
+	try{
+		const res = await fetch(
+			`${serverName}/api/hotsearch/group/${context.params.hsdate}`
+		);
+	
+		const { data } = await res.json();
+		return { props: { dateProps: context.params.hsdate, dataProps:data } };
+	}catch(e){
+		console.log(e)
+	}
+	return { props: { dateProps:null, dataProps:null  } };
+	
 }
 
-export default function DailyHotSearch(props) {
+export default function DailyHotSearch({dateProps,dataProps}) {
     const router = useRouter();
     const data = React.useMemo(()=>{
-        return props.data
-    },[props])
+        return dataProps
+    },[dataProps])
 	const date = React.useMemo(() => {
+		if(dateProps == null) return;
 		var d = new Date();
-		const datestring = props.date;
+		const datestring = dateProps || "";
 		const year = datestring.substring(0, 4);
 		const month = datestring.substring(4, 6);
 		const date = datestring.substring(6, 8);
@@ -34,7 +41,7 @@ export default function DailyHotSearch(props) {
 		d.setMonth(month - 1);
 		d.setDate(date);
 		return formatDate(d);
-	}, [props]);
+	}, [dateProps]);
 
 	function redirect(value) {
 		router.push(getHotSearchDateUrl(value));
@@ -43,6 +50,7 @@ export default function DailyHotSearch(props) {
 		router.push(getHotSearchDateUrl(date));
 	}
 	function addDate(add) {
+		if(date == null) return;
 		const d = new Date(date);
 		var newDate = addSubtractDate(d, add);
 		router.push(getHotSearchDateUrl(newDate));

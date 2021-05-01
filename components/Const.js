@@ -1,5 +1,10 @@
 var dateFormat = require("dateformat");
 
+const dev = process.env.NODE_ENV !== 'production';
+
+export const serverName = dev ? 'http://localhost:3000' : 'https://hotsearchviet.online';
+
+
 export function getIdFromSearch(search) {
 	return search.split("?id=").length >= 1 ? search.split("?id=")[1] : "";
 }
@@ -78,17 +83,15 @@ export function isMobile() {
 	return check;
 }
 
-export const myDomainName = "https://hotsearchviet.online/";
-// export const myDomainName = "http://localhost:3000";
 export const EMAIL = "admin@hotsearchviet.online";
 
 export const FACEBOOK_APP_ID = "174600884477732";
 
 export function getHotSearchUrl(id) {
-	return `/hotsearch/` + id;
+	return `${serverName}/hotsearch/` + id;
 }
 export function getHotSearchDateUrl(date) {
-	return `/daily-hotsearch/` + getdatesql(date);
+	return `${serverName}/daily-hotsearch/` + getdatesql(date);
 }
 
 export function formatDate(date) {
